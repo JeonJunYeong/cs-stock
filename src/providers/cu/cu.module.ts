@@ -1,0 +1,1 @@
+import {Module} from '@nestjs/common';import {CuClient} from './cu.client';import {CuProvider} from './cu.provider';@Module({providers:[CuClient,CuProvider],exports:[CuProvider]})export class CuModule{}
