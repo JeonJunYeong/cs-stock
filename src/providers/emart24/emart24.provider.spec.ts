@@ -1,2 +1,21 @@
-import { Emart24Provider } from './emart24.provider';
-describe('Emart24Provider',()=>{it('maps product fields',async()=>{const client:any={products:jest.fn().mockResolvedValue({productList:[{pluCd:'P1',goodsNm:'콜라',viewPrice:1500}]}),stores:jest.fn(),inventory:jest.fn()};const result=await new Emart24Provider(client).searchProducts('콜라');expect(result[0]).toMatchObject({brand:'EMART24',productCode:'P1',name:'콜라',price:1500})})});
+import { Emart24Provider } from "./emart24.provider";
+describe("Emart24Provider", () => {
+  it("maps product fields", async () => {
+    const client: any = {
+      products: jest
+        .fn()
+        .mockResolvedValue({
+          productList: [{ pluCd: "P1", goodsNm: "콜라", viewPrice: 1500 }],
+        }),
+      stores: jest.fn(),
+      inventory: jest.fn(),
+    };
+    const result = await new Emart24Provider(client).searchProducts("콜라");
+    expect(result[0]).toMatchObject({
+      brand: "EMART24",
+      productCode: "P1",
+      name: "콜라",
+      price: 1500,
+    });
+  });
+});

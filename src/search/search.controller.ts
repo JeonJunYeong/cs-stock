@@ -1,1 +1,35 @@
-import{Controller,Get,Query,BadRequestException}from'@nestjs/common';import{ProviderRegistry}from'../providers/provider.registry';@Controller('api/search')export class SearchController{constructor(private registry:ProviderRegistry){}@Get()async search(@Query('keyword')keyword:string,@Query('brand')brand='ALL'){if(!keyword?.trim())throw new BadRequestException('keyword is required');const brands=brand.toUpperCase()==='ALL'?this.registry.brands():[brand.toUpperCase()];const results=await Promise.all(brands.map(async code=>{try{return{brand:code,success:true,products:await this.registry.get(code).searchProducts(keyword)}}catch{return{brand:code,success:false,error:'UPSTREAM_API_ERROR',products:[]}}}));return{results}}}
+import { Controller, Get, Query, BadRequestException } from "@nestjs/common";
+import { ProviderRegistry } from "../providers/provider.registry";
+@Controller("api/search")
+export class SearchController {
+  constructor(private registry: ProviderRegistry) {}
+  @Get() async search(
+    @Query("keyword") keyword: string,
+    @Query("brand") brand = "ALL",
+  ) {
+    if (!keyword?.trim()) throw new BadRequestException("keyword is required");
+    const brands =
+      brand.toUpperCase() === "ALL"
+        ? this.registry.brands()
+        : [brand.toUpperCase()];
+    const results = await Promise.all(
+      brands.map(async (code) => {
+        try {
+          return {
+            brand: code,
+            success: true,
+            products: await this.registry.get(code).searchProducts(keyword),
+          };
+        } catch {
+          return {
+            brand: code,
+            success: false,
+            error: "UPSTREAM_API_ERROR",
+            products: [],
+          };
+        }
+      }),
+    );
+    return { results };
+  }
+}

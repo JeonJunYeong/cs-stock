@@ -1,2 +1,69 @@
-import{Injectable,NotFoundException}from'@nestjs/common';import{InjectRepository}from'@nestjs/typeorm';import{Repository}from'typeorm';import{BrandEntity,InventoryEntity,ProductEntity,StoreEntity}from'../database/entities';import{ProviderRegistry}from'../providers/provider.registry';
-@Injectable()export class InventoryService{constructor(private registry:ProviderRegistry,@InjectRepository(InventoryEntity)private repo:Repository<InventoryEntity>,@InjectRepository(BrandEntity)private brands:Repository<BrandEntity>,@InjectRepository(ProductEntity)private products:Repository<ProductEntity>,@InjectRepository(StoreEntity)private stores:Repository<StoreEntity>){}async lookup(brand:string,productCode:string,storeCodes:string[]){if(!productCode)throw new Error('productCode is required');if(!storeCodes.length)throw new Error('storeCodes is required');const brandEntity=await this.brands.findOneBy({code:brand.toUpperCase()});if(!brandEntity)throw new NotFoundException('Brand not found');const items=await this.registry.get(brand).getInventory(productCode,storeCodes);await this.products.upsert({brandId:brandEntity.id,productCode,name:productCode},['brandId','productCode']);const product=await this.products.findOneBy({brandId:brandEntity.id,productCode});if(!product)throw new Error('Product persistence failed');for(const x of items){await this.stores.upsert({brandId:brandEntity.id,storeCode:x.storeCode,name:x.storeName||x.storeCode},['brandId','storeCode']);const store=await this.stores.findOneBy({brandId:brandEntity.id,storeCode:x.storeCode});if(store)await this.repo.upsert({brandId:brandEntity.id,productId:product.id,storeId:store.id,quantity:x.quantity,checkedAt:x.checkedAt},['brandId','productId','storeId'])}return items}}
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import {
+  BrandEntity,
+  InventoryEntity,
+  ProductEntity,
+  StoreEntity,
+} from "../database/entities";
+import { ProviderRegistry } from "../providers/provider.registry";
+@Injectable()
+export class InventoryService {
+  constructor(
+    private registry: ProviderRegistry,
+    @InjectRepository(InventoryEntity)
+    private repo: Repository<InventoryEntity>,
+    @InjectRepository(BrandEntity) private brands: Repository<BrandEntity>,
+    @InjectRepository(ProductEntity)
+    private products: Repository<ProductEntity>,
+    @InjectRepository(StoreEntity) private stores: Repository<StoreEntity>,
+  ) {}
+  async lookup(brand: string, productCode: string, storeCodes: string[]) {
+    if (!productCode) throw new Error("productCode is required");
+    if (!storeCodes.length) throw new Error("storeCodes is required");
+    const brandEntity = await this.brands.findOneBy({
+      code: brand.toUpperCase(),
+    });
+    if (!brandEntity) throw new NotFoundException("Brand not found");
+    const items = await this.registry
+      .get(brand)
+      .getInventory(productCode, storeCodes);
+    await this.products.upsert(
+      { brandId: brandEntity.id, productCode, name: productCode },
+      ["brandId", "productCode"],
+    );
+    const product = await this.products.findOneBy({
+      brandId: brandEntity.id,
+      productCode,
+    });
+    if (!product) throw new Error("Product persistence failed");
+    for (const x of items) {
+      await this.stores.upsert(
+        {
+          brandId: brandEntity.id,
+          storeCode: x.storeCode,
+          name: x.storeName || x.storeCode,
+        },
+        ["brandId", "storeCode"],
+      );
+      const store = await this.stores.findOneBy({
+        brandId: brandEntity.id,
+        storeCode: x.storeCode,
+      });
+      if (store)
+        await this.repo.upsert(
+          {
+            brandId: brandEntity.id,
+            productId: product.id,
+            storeId: store.id,
+            quantity: x.quantity,
+            checkedAt: x.checkedAt,
+            metadata: x.raw as any,
+          },
+          ["brandId", "productId", "storeId"],
+        );
+    }
+    return items;
+  }
+}

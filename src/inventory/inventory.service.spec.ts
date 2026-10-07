@@ -1,2 +1,43 @@
-import { InventoryService } from './inventory.service';
-describe('InventoryService',()=>{it('upserts provider inventory with normalized references',async()=>{const row={brand:'EMART24',productCode:'P',storeCode:'S',quantity:2,checkedAt:new Date()};const registry:any={get:()=>({getInventory:jest.fn().mockResolvedValue([row])})};const inventoryRepo:any={upsert:jest.fn()};const brandRepo:any={findOneBy:jest.fn().mockResolvedValue({id:'B'})};const productRepo:any={upsert:jest.fn(),findOneBy:jest.fn().mockResolvedValue({id:'P-ID'})};const storeRepo:any={upsert:jest.fn(),findOneBy:jest.fn().mockResolvedValue({id:'S-ID'})};const service=new InventoryService(registry,inventoryRepo,brandRepo,productRepo,storeRepo);expect(await service.lookup('EMART24','P',['S'])).toEqual([row]);expect(inventoryRepo.upsert).toHaveBeenCalledWith(expect.objectContaining({brandId:'B',productId:'P-ID',storeId:'S-ID'}),['brandId','productId','storeId'])})});
+import { InventoryService } from "./inventory.service";
+describe("InventoryService", () => {
+  it("upserts provider inventory with normalized references", async () => {
+    const row = {
+      brand: "EMART24",
+      productCode: "P",
+      storeCode: "S",
+      quantity: 2,
+      checkedAt: new Date(),
+    };
+    const registry: any = {
+      get: () => ({ getInventory: jest.fn().mockResolvedValue([row]) }),
+    };
+    const inventoryRepo: any = { upsert: jest.fn() };
+    const brandRepo: any = {
+      findOneBy: jest.fn().mockResolvedValue({ id: "B" }),
+    };
+    const productRepo: any = {
+      upsert: jest.fn(),
+      findOneBy: jest.fn().mockResolvedValue({ id: "P-ID" }),
+    };
+    const storeRepo: any = {
+      upsert: jest.fn(),
+      findOneBy: jest.fn().mockResolvedValue({ id: "S-ID" }),
+    };
+    const service = new InventoryService(
+      registry,
+      inventoryRepo,
+      brandRepo,
+      productRepo,
+      storeRepo,
+    );
+    expect(await service.lookup("EMART24", "P", ["S"])).toEqual([row]);
+    expect(inventoryRepo.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        brandId: "B",
+        productId: "P-ID",
+        storeId: "S-ID",
+      }),
+      ["brandId", "productId", "storeId"],
+    );
+  });
+});

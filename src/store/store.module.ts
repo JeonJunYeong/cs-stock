@@ -1,1 +1,15 @@
-import{Module}from'@nestjs/common';import{TypeOrmModule}from'@nestjs/typeorm';import{BrandEntity,StoreEntity}from'../database/entities';import{ProvidersModule}from'../providers/providers.module';import{StoreService}from'./store.service';import{StoreController}from'./store.controller';@Module({imports:[TypeOrmModule.forFeature([StoreEntity,BrandEntity]),ProvidersModule],providers:[StoreService],controllers:[StoreController]})export class StoreModule{}
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { BrandEntity, StoreEntity } from "../database/entities";
+import { ProvidersModule } from "../providers/providers.module";
+import { StoreService } from "./store.service";
+import { StoreController } from "./store.controller";
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([StoreEntity, BrandEntity]),
+    ProvidersModule,
+  ],
+  providers: [StoreService],
+  controllers: [StoreController],
+})
+export class StoreModule {}

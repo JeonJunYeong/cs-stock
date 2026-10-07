@@ -1,2 +1,46 @@
-import{ArgumentsHost,Catch,ExceptionFilter,HttpException,HttpStatus}from'@nestjs/common';import{Response,Request}from'express';import{NotImplementedProviderError,UpstreamApiError}from'./interfaces/convenience-provider.interface';
-@Catch()export class ApiExceptionFilter implements ExceptionFilter{catch(error:unknown,host:ArgumentsHost){const ctx=host.switchToHttp(),res=ctx.getResponse<Response>(),req=ctx.getRequest<Request>();if(error instanceof UpstreamApiError){res.status(502).json({brand:error.brand,success:false,error:error.code});return}if(error instanceof NotImplementedProviderError){res.status(501).json({brand:error.brand,success:false,error:error.code,capability:error.capability});return}const status=error instanceof HttpException?error.getStatus():HttpStatus.INTERNAL_SERVER_ERROR;const message=error instanceof HttpException?error.getResponse():'INTERNAL_SERVER_ERROR';res.status(status).json({success:false,error:message,path:req.url})}}
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
+import { Response, Request } from "express";
+import {
+  NotImplementedProviderError,
+  UpstreamApiError,
+} from "./interfaces/convenience-provider.interface";
+@Catch()
+export class ApiExceptionFilter implements ExceptionFilter {
+  catch(error: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp(),
+      res = ctx.getResponse<Response>(),
+      req = ctx.getRequest<Request>();
+    if (error instanceof UpstreamApiError) {
+      res
+        .status(502)
+        .json({ brand: error.brand, success: false, error: error.code });
+      return;
+    }
+    if (error instanceof NotImplementedProviderError) {
+      res
+        .status(501)
+        .json({
+          brand: error.brand,
+          success: false,
+          error: error.code,
+          capability: error.capability,
+        });
+      return;
+    }
+    const status =
+      error instanceof HttpException
+        ? error.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+    const message =
+      error instanceof HttpException
+        ? error.getResponse()
+        : "INTERNAL_SERVER_ERROR";
+    res.status(status).json({ success: false, error: message, path: req.url });
+  }
+}

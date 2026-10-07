@@ -1,2 +1,29 @@
-import { Gs25Provider } from './gs25.provider';
-describe('Gs25Provider',()=>{it('maps product fields',async()=>{const client:any={products:jest.fn().mockResolvedValue({SearchQueryResult:{Collection:[{Documentset:{Document:[{field:{itemCode:'G1',itemName:'상품'}}]}}]}}),stores:jest.fn()};expect(await new Gs25Provider(client).searchProducts('상품')).toMatchObject([{brand:'GS25',productCode:'G1',name:'상품'}])});it('leaves unverified inventory unimplemented',async()=>{await expect(new Gs25Provider({}as any).getInventory('G1',['S1'])).rejects.toMatchObject({code:'NOT_IMPLEMENTED'})})});
+import { Gs25Provider } from "./gs25.provider";
+describe("Gs25Provider", () => {
+  it("maps product fields", async () => {
+    const client: any = {
+      products: jest
+        .fn()
+        .mockResolvedValue({
+          SearchQueryResult: {
+            Collection: [
+              {
+                Documentset: {
+                  Document: [{ field: { itemCode: "G1", itemName: "상품" } }],
+                },
+              },
+            ],
+          },
+        }),
+      stores: jest.fn(),
+    };
+    expect(await new Gs25Provider(client).searchProducts("상품")).toMatchObject(
+      [{ brand: "GS25", productCode: "G1", name: "상품" }],
+    );
+  });
+  it("leaves unverified inventory unimplemented", async () => {
+    await expect(
+      new Gs25Provider({} as any).getInventory("G1", ["S1"]),
+    ).rejects.toMatchObject({ code: "NOT_IMPLEMENTED" });
+  });
+});

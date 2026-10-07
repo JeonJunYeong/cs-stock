@@ -1,2 +1,46 @@
-import{Body,Controller,Get,Post,Param,Patch,BadRequestException}from'@nestjs/common';import{InjectRepository}from'@nestjs/typeorm';import{Repository}from'typeorm';import{MonitorTargetEntity}from'../database/entities';import{ProviderRegistry}from'../providers/provider.registry';
-@Controller('api/monitor/targets')export class MonitorController{constructor(@InjectRepository(MonitorTargetEntity)private repo:Repository<MonitorTargetEntity>,private registry:ProviderRegistry){}@Get()list(){return this.repo.find()}@Post()async create(@Body()body:any){if(!body?.brand||!body?.productCode||!body?.storeCode)throw new BadRequestException('brand, productCode and storeCode are required');const brand=body.brand.toUpperCase();this.registry.get(brand);return this.repo.save(this.repo.create({brandCode:brand,productCode:String(body.productCode),storeCode:String(body.storeCode),enabled:true}))}@Patch(':id')async update(@Param('id')id:string,@Body()body:any){const target=await this.repo.findOneBy({id});if(!target)throw new BadRequestException('monitor target not found');target.enabled=Boolean(body.enabled);return this.repo.save(target)}}
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Param,
+  Patch,
+  BadRequestException,
+} from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
+import { MonitorTargetEntity } from "../database/entities";
+import { ProviderRegistry } from "../providers/provider.registry";
+@Controller("api/monitor/targets")
+export class MonitorController {
+  constructor(
+    @InjectRepository(MonitorTargetEntity)
+    private repo: Repository<MonitorTargetEntity>,
+    private registry: ProviderRegistry,
+  ) {}
+  @Get() list() {
+    return this.repo.find();
+  }
+  @Post() async create(@Body() body: any) {
+    if (!body?.brand || !body?.productCode || !body?.storeCode)
+      throw new BadRequestException(
+        "brand, productCode and storeCode are required",
+      );
+    const brand = body.brand.toUpperCase();
+    this.registry.get(brand);
+    return this.repo.save(
+      this.repo.create({
+        brandCode: brand,
+        productCode: String(body.productCode),
+        storeCode: String(body.storeCode),
+        enabled: true,
+      }),
+    );
+  }
+  @Patch(":id") async update(@Param("id") id: string, @Body() body: any) {
+    const target = await this.repo.findOneBy({ id });
+    if (!target) throw new BadRequestException("monitor target not found");
+    target.enabled = Boolean(body.enabled);
+    return this.repo.save(target);
+  }
+}

@@ -1,2 +1,31 @@
-import {Injectable} from '@nestjs/common';import {ConvenienceProvider,UpstreamApiError,NotImplementedProviderError} from '../../common/interfaces/convenience-provider.interface';import {Product} from '../../common/types/product.type';import {Store} from '../../common/types/store.type';import {Inventory} from '../../common/types/inventory.type';import {Gs25Client} from './gs25.client';import {mapGsProducts,mapGsStores} from './gs25.mapper';
-@Injectable() export class Gs25Provider implements ConvenienceProvider{constructor(private client:Gs25Client){}private async call<T>(fn:()=>Promise<T>):Promise<T>{try{return await fn()}catch(e){throw new UpstreamApiError('GS25',{cause:e})}}searchProducts(k:string):Promise<Product[]>{return this.call(async()=>mapGsProducts(await this.client.products(k)))}searchStores(k:string):Promise<Store[]>{return this.call(async()=>mapGsStores(await this.client.stores(k)))}async getInventory(_p:string,_s:string[]):Promise<Inventory[]>{throw new NotImplementedProviderError('GS25','inventory') }}
+import { Injectable } from "@nestjs/common";
+import {
+  ConvenienceProvider,
+  UpstreamApiError,
+  NotImplementedProviderError,
+} from "../../common/interfaces/convenience-provider.interface";
+import { Product } from "../../common/types/product.type";
+import { Store } from "../../common/types/store.type";
+import { Inventory } from "../../common/types/inventory.type";
+import { Gs25Client } from "./gs25.client";
+import { mapGsProducts, mapGsStores } from "./gs25.mapper";
+@Injectable()
+export class Gs25Provider implements ConvenienceProvider {
+  constructor(private client: Gs25Client) {}
+  private async call<T>(fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
+    } catch (e) {
+      throw new UpstreamApiError("GS25", { cause: e });
+    }
+  }
+  searchProducts(k: string): Promise<Product[]> {
+    return this.call(async () => mapGsProducts(await this.client.products(k)));
+  }
+  searchStores(k: string): Promise<Store[]> {
+    return this.call(async () => mapGsStores(await this.client.stores(k)));
+  }
+  async getInventory(_p: string, _s: string[]): Promise<Inventory[]> {
+    throw new NotImplementedProviderError("GS25", "inventory");
+  }
+}

@@ -1,3 +1,26 @@
-import {Product} from '../../common/types/product.type';import {Store} from '../../common/types/store.type';
-export const mapGsProducts=(b:any):Product[]=>b?.SearchQueryResult?.Collection?.flatMap((c:any)=>c?.Documentset?.Document??[]).map((d:any)=>d?.field??d).filter((x:any)=>x.itemCode).map((x:any)=>({brand:'GS25',productCode:String(x.itemCode),name:String(x.itemName??''),raw:x}))??[];
-export const mapGsStores=(b:any):Store[]=> (Array.isArray(b)?b:[]).filter((x:any)=>x.shopCode).map((x:any)=>({brand:'GS25',storeCode:String(x.shopCode),name:String(x.shopName??''),address:x.address,latitude:Number(x.posY)||undefined,longitude:Number(x.posX)||undefined,raw:x}));
+import { Product } from "../../common/types/product.type";
+import { Store } from "../../common/types/store.type";
+export const mapGsProducts = (b: any): Product[] =>
+  b?.SearchQueryResult?.Collection?.flatMap(
+    (c: any) => c?.Documentset?.Document ?? [],
+  )
+    .map((d: any) => d?.field ?? d)
+    .filter((x: any) => x.itemCode)
+    .map((x: any) => ({
+      brand: "GS25",
+      productCode: String(x.itemCode),
+      name: String(x.itemName ?? ""),
+      raw: x,
+    })) ?? [];
+export const mapGsStores = (b: any): Store[] =>
+  (Array.isArray(b) ? b : [])
+    .filter((x: any) => x.shopCode)
+    .map((x: any) => ({
+      brand: "GS25",
+      storeCode: String(x.shopCode),
+      name: String(x.shopName ?? ""),
+      address: x.address,
+      latitude: Number(x.posY) || undefined,
+      longitude: Number(x.posX) || undefined,
+      raw: x,
+    }));
